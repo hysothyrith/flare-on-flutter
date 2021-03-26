@@ -5,36 +5,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SignInView extends StatelessWidget {
-  Future<void> saveCredentials(AuthResponse response) async {
-    final storage = new FlutterSecureStorage();
-    print("Saving token...");
-    storage.write(key: 'token', value: response.accessToken).then((value) {
-      print("Token saved");
-
-      print("Saving token expiry date...");
-      DateTime now = DateTime.now();
-      DateTime tokenExpiryDate = now.add(Duration(minutes: response.expiresIn));
-      storage.write(key: 'tokenExpiryDate', value: tokenExpiryDate.toString());
-      print("Token expiry date saved");
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: SafeArea(
-      child: SignInForm(
-        onSubmit: (email, password) {
-          Auth auth = Auth();
-          auth.signIn(email: email, password: password).then((success) {
-            if (success) {
-              print("HI");
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (context) => Home()));
-            } else {
-              print("Invalid credentials");
-            }
-          });
-        },
+      child: Column(
+        children: [
+          Image(image: AssetImage('assets/images/flare_logo.png')),
+          SignInForm(
+            onSubmit: (email, password) {
+              AuthRepo auth = AuthRepo();
+              auth.signIn(email: email, password: password).then((success) {
+                if (success) {
+                  Navigator.pushReplacement(
+                      context, MaterialPageRoute(builder: (context) => Home()));
+                } else {
+                  print("Invalid credentials");
+                }
+              });
+            },
+          )
+        ],
       ),
     ));
   }

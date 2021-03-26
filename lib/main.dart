@@ -16,10 +16,11 @@ class MyApp extends StatelessWidget {
   final primaryBackgroundColor = Color(0xFFFFFFFF);
   final accentColor = Colors.red;
   final highlightColor = Color(0xFF02C39A);
-  final Auth auth = new Auth();
+  final AuthRepo authRepo = new AuthRepo();
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Flare',
       theme: ThemeData(
@@ -68,7 +69,7 @@ class MyApp extends StatelessWidget {
               elevation: 0, iconTheme: IconThemeData(color: primaryColor))),
       debugShowCheckedModeBanner: false,
       home: FutureBuilder(
-          future: auth.verifyExistingCredentials(),
+          future: authRepo.verifyExistingCredentials(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text("Error loading app");

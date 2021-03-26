@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-class Auth {
+class AuthRepo {
   final baseUrl = "http://10.0.2.2:8000/api/auth";
 
   Future<bool> signIn({String email, String password}) async {
@@ -37,6 +37,12 @@ class Auth {
     } else {
       throw Exception("Sign up failed");
     }
+  }
+
+  signOut() async {
+    final storage = new FlutterSecureStorage();
+    await storage.delete(key: 'token');
+    await storage.delete(key: 'tokenExpiryDate');
   }
 
   Future<bool> verifyExistingCredentials() async {
