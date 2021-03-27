@@ -4,12 +4,12 @@ import 'package:flare/repositories/course.dart';
 import 'package:flare/views/course_details.dart';
 import 'package:flutter/material.dart';
 
-class Home extends StatefulWidget {
+class HomeView extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _HomeViewState createState() => _HomeViewState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeViewState extends State<HomeView> {
   CourseRepo courseRepo = CourseRepo();
 
   onCardCourseTap(int courseId) {

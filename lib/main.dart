@@ -16,11 +16,13 @@ class MyApp extends StatelessWidget {
   final primaryBackgroundColor = Color(0xFFFFFFFF);
   final accentColor = Colors.red;
   final highlightColor = Color(0xFF02C39A);
+  final secondaryColor = Color(0xFF8e9aaf);
+  final brandColor = Color(0xFF6A00F4);
+
   final AuthRepo authRepo = new AuthRepo();
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'Flare',
       theme: ThemeData(
@@ -28,6 +30,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: primaryBackgroundColor,
           accentColor: accentColor,
           highlightColor: highlightColor,
+          hintColor: captionColor,
           textTheme: TextTheme(
               headline1: GoogleFonts.poppins(
                   textStyle: TextStyle(
@@ -65,17 +68,30 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: primaryColor),
           scaffoldBackgroundColor: backgroundColorDarker,
           visualDensity: VisualDensity.adaptivePlatformDensity,
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              primary: highlightColor
+            )
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+                primary: primaryColor,
+                padding:
+                    EdgeInsets.only(left: 32, top: 16, right: 32, bottom: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32))),
+          ),
           appBarTheme: AppBarTheme(
               elevation: 0, iconTheme: IconThemeData(color: primaryColor))),
       debugShowCheckedModeBanner: false,
       home: FutureBuilder(
-          future: authRepo.verifyExistingCredentials(),
+          future: authRepo.verifyLocalCredentials(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text("Error loading app");
             }
             if (snapshot.connectionState == ConnectionState.done) {
-              return snapshot.data ? Home() : SignInView();
+              return snapshot.data ? HomeView() : SignInView();
             } else {
               return CircularProgressIndicator();
             }

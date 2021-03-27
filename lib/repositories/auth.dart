@@ -1,26 +1,30 @@
 import 'package:flare/models/auth_response.dart';
+import 'package:flare/repositories/api_repository.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-class AuthRepo {
-  final baseUrl = "http://10.0.2.2:8000/api/auth";
+class AuthRepo extends ApiRepository {
+  AuthRepo() : super(baseUrlPostfix: "auth");
 
   Future<bool> signIn({String email, String password}) async {
     http.Response response = await http
         .post("$baseUrl/login", body: {'email': email, 'password': password});
 
     if (response.statusCode == 200) {
+      print("Sign in successful. Computing response...");
       AuthResponse authResponse =
           await compute(authResponseFromJson, response.body);
+      print("Saving credentials...");
       await _saveCredentials(authResponse);
       return true;
     } else {
+      print("Sign in failed");
+      print(response.body);
       return false;
     }
   }
 
-  Future<AuthResponse> signUp(
+  Future<bool> signUp(
       {String name,
       String email,
       String password,
@@ -33,46 +37,61 @@ class AuthRepo {
     });
 
     if (response.statusCode == 200) {
-      return compute(authResponseFromJson, response.body);
+      print("Sign up successful. Computing response...");
+      AuthResponse authResponse =
+          await compute(authResponseFromJson, response.body);
+      print("Saving credentials...");
+      await _saveCredentials(authResponse);
+      return true;
     } else {
-      throw Exception("Sign up failed");
+      print("Sign up failed");
+      print(response.body);
+      return false;
     }
   }
 
   signOut() async {
-    final storage = new FlutterSecureStorage();
-    await storage.delete(key: 'token');
-    await storage.delete(key: 'tokenExpiryDate');
+    await _clearLocalCredentials();
   }
 
-  Future<bool> verifyExistingCredentials() async {
-    final storage = new FlutterSecureStorage();
+  Future<bool> verifyLocalCredentials() async {
+    print("Verifying local credentials...");
 
-    String token = await storage.read(key: 'token');
-    if (token == null) {
+    if (await localToken == null) {
+      print("No local token");
       return false;
     }
-    DateTime tokenExpiryDate =
-        DateTime.parse(await storage.read(key: 'tokenExpiryDate'));
-    if (tokenExpiryDate.isBefore(DateTime.now())) {
-      storage.delete(key: 'token');
-      storage.delete(key: 'tokenExpiryDate');
+
+    if ((await localTokenExpiryDate).isBefore(DateTime.now())) {
+      print("Local token expired");
+      _clearLocalCredentials();
       return false;
     }
+    print("Local credentials verification successful");
     return true;
   }
 
   Future<void> _saveCredentials(AuthResponse response) async {
-    final storage = new FlutterSecureStorage();
     print("Saving token...");
-    storage.write(key: 'token', value: response.accessToken).then((value) {
+    _setLocalToken(response.accessToken).then((value) {
       print("Token saved");
 
       print("Saving token expiry date...");
       DateTime now = DateTime.now();
       DateTime tokenExpiryDate = now.add(Duration(minutes: response.expiresIn));
-      storage.write(key: 'tokenExpiryDate', value: tokenExpiryDate.toString());
+      _setLocalTokenExpiryDate(tokenExpiryDate);
       print("Token expiry date saved");
     });
   }
+
+  Future<void> _clearLocalCredentials() async {
+    await storage.delete(key: 'token');
+    await storage.delete(key: 'tokenExpiryDate');
+  }
+
+  Future<void> _setLocalToken(String token) =>
+      storage.write(key: 'token', value: token);
+
+  Future<void> _setLocalTokenExpiryDate(DateTime expiryDate) =>
+      storage.write(key: 'tokenExpiryDate', value: expiryDate.toString());
 }
