@@ -36,7 +36,7 @@ class AuthRepo extends ApiRepository {
       'password_confirmation': passwordConfirmation
     });
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       print("Sign up successful. Computing response...");
       AuthResponse authResponse =
           await compute(authResponseFromJson, response.body);

@@ -16,14 +16,20 @@ class SignUpView extends StatelessWidget {
             child: Image(image: AssetImage('assets/images/flare_logo.png')),
           ),
           SignUpForm(
-            onSubmit: (email, password) {
-              AuthRepo auth = AuthRepo();
-              auth.signIn(email: email, password: password).then((success) {
+            onSubmit: (name, email, password, passwordConfirmation) {
+              AuthRepo authRepo = AuthRepo();
+              authRepo
+                  .signUp(
+                      name: name,
+                      email: email,
+                      password: password,
+                      passwordConfirmation: passwordConfirmation)
+                  .then((success) {
                 if (success) {
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => HomeView()));
                 } else {
-                  print("Invalid credentials");
+                  print("Invalid sign up credentials");
                 }
               });
             },
@@ -35,7 +41,8 @@ class SignUpView extends StatelessWidget {
 }
 
 class SignUpForm extends StatefulWidget {
-  final Function(String, String) onSubmit;
+  final Function(String name, String email, String password,
+      String passwordConfirmation) onSubmit;
 
   SignUpForm({this.onSubmit});
 
@@ -45,9 +52,9 @@ class SignUpForm extends StatefulWidget {
 
 class _SignUpFormState extends State<SignUpForm> {
   String name;
-  String confirmPassword;
   String email;
   String password;
+  String passwordConfirmation;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -55,8 +62,7 @@ class _SignUpFormState extends State<SignUpForm> {
           r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
       .hasMatch(email);
 
-  bool _validatePassword(String password) =>
-      RegExp(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$").hasMatch(password);
+  bool _validatePassword(String password) => password != null && password.isNotEmpty && password.length >= 8;
 
   @override
   Widget build(BuildContext context) {
@@ -95,26 +101,23 @@ class _SignUpFormState extends State<SignUpForm> {
         password = value;
       },
       validator: (value) {
+        print(value);
         if (!_validatePassword(value)) {
-          return "A valid password must have more than 8 characters and at least 1 number and symbol";
+          return "A valid password must have more than 8 characters";
         }
         return null;
       },
-      decoration: _inputFieldDecoration(
-          hintText: "Password"),
+      decoration: _inputFieldDecoration(hintText: "Password"),
       obscureText: true,
     );
 
     final _confirmPasswordField = TextFormField(
       onSaved: (value) {
-        password = value;
+        passwordConfirmation = value;
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
           return "Please enter a password confirmation";
-        }
-        if (confirmPassword.compareTo(password) != 0) {
-          return "Password confirmation does not match";
         }
         return null;
       },
@@ -126,15 +129,15 @@ class _SignUpFormState extends State<SignUpForm> {
         onPressed: () {
           if (_formKey.currentState.validate()) {
             _formKey.currentState.save();
-            this.widget.onSubmit(email, password);
+            this.widget.onSubmit(name, email, password, passwordConfirmation);
           }
         },
         child: Text("Sign Up"));
 
     final _signInInvitation = TextButton(
       onPressed: () {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => SignInView()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => SignInView()));
       },
       child: Text("Already have an account? Sign In"),
       style: TextButton.styleFrom(
