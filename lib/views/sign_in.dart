@@ -1,36 +1,44 @@
 import 'package:flare/repositories/auth.dart';
 import 'package:flare/views/home.dart';
 import 'package:flare/views/sign_up.dart';
+import 'package:flare/widgets/flare_text_form_field.dart';
 import 'package:flutter/material.dart';
 
 class SignInView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: MediaQuery.of(context).size.width * 0.4,
-            child: Image(image: AssetImage('assets/images/flare_logo.png')),
+      body: SafeArea(
+        child: Center(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child:
+                      Image(image: AssetImage('assets/images/flare_logo.png')),
+                ),
+              ),
+              SignInForm(
+                onSubmit: (email, password) {
+                  AuthRepo auth = AuthRepo();
+                  auth.signIn(email: email, password: password).then((success) {
+                    if (success) {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => HomeView()));
+                    } else {
+                      print("Invalid credentials");
+                    }
+                  });
+                },
+              ),
+            ],
           ),
-          SignInForm(
-            onSubmit: (email, password) {
-              AuthRepo auth = AuthRepo();
-              auth.signIn(email: email, password: password).then((success) {
-                if (success) {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => HomeView()));
-                } else {
-                  print("Invalid credentials");
-                }
-              });
-            },
-          )
-        ],
+        ),
       ),
-    ));
+    );
   }
 }
 
@@ -55,17 +63,9 @@ class _SignInFormState extends State<SignInForm> {
 
   @override
   Widget build(BuildContext context) {
-    final _inputFieldBorderRadius = BorderRadius.all(Radius.circular(8));
-
-    _inputFieldDecoration({String hintText = ""}) => InputDecoration(
-        contentPadding: EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
-        border: OutlineInputBorder(borderRadius: _inputFieldBorderRadius),
-        enabledBorder: OutlineInputBorder(
-            borderRadius: _inputFieldBorderRadius,
-            borderSide: BorderSide(color: Theme.of(context).hintColor)),
-        hintText: hintText);
-
-    final _emailField = TextFormField(
+    final _emailField = FlareTextFormField(
+      labelText: "Email",
+      hintText: "jamesbond@cia.com",
       onSaved: (value) {
         email = value;
       },
@@ -75,10 +75,11 @@ class _SignInFormState extends State<SignInForm> {
         }
         return null;
       },
-      decoration: _inputFieldDecoration(hintText: "Email"),
     );
 
-    final _passwordField = TextFormField(
+    final _passwordField = FlareTextFormField(
+      labelText: "Password",
+      obscureText: true,
       onSaved: (value) {
         password = value;
       },
@@ -88,8 +89,6 @@ class _SignInFormState extends State<SignInForm> {
         }
         return null;
       },
-      decoration: _inputFieldDecoration(hintText: "Password"),
-      obscureText: true,
     );
 
     final _signInButton = ElevatedButton(
@@ -113,19 +112,20 @@ class _SignInFormState extends State<SignInForm> {
     );
 
     return Form(
-        key: _formKey,
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Column(
-            children: <Widget>[
-              _emailField,
-              SizedBox(height: 8),
-              _passwordField,
-              SizedBox(height: 16),
-              _signInButton,
-              _signUpInvitation
-            ],
-          ),
-        ));
+      key: _formKey,
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          children: <Widget>[
+            _emailField,
+            SizedBox(height: 16),
+            _passwordField,
+            SizedBox(height: 24),
+            _signInButton,
+            _signUpInvitation
+          ],
+        ),
+      ),
+    );
   }
 }

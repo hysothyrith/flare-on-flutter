@@ -18,14 +18,13 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final displayedDuration = this.duration < 60 ? "$duration mins" : "${duration ~/
-    //     60} h ${duration % 60} m";
     final displayedDuration = this.duration < 60
         ? "$duration min${duration > 1 ? "s" : ""}"
         : "${duration ~/ 60} hour${duration ~/ 60 > 1 ? "s" : ""}";
 
     return Card(
       elevation: 8,
+      color: Theme.of(context).backgroundColor,
       shadowColor: Colors.grey.withOpacity(0.1),
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16))),

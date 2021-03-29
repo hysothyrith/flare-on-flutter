@@ -24,16 +24,11 @@ class AuthRepo extends ApiRepository {
     }
   }
 
-  Future<bool> signUp(
-      {String name,
-      String email,
-      String password,
-      String passwordConfirmation}) async {
+  Future<bool> signUp({String name, String email, String password}) async {
     http.Response response = await http.post("$baseUrl/register", body: {
       'name': name,
       'email': email,
       'password': password,
-      'password_confirmation': passwordConfirmation
     });
 
     if (response.statusCode == 201) {
@@ -50,7 +45,7 @@ class AuthRepo extends ApiRepository {
     }
   }
 
-  signOut() async {
+  Future<void> signOut() async {
     await _clearLocalCredentials();
   }
 

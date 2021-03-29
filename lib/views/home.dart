@@ -1,7 +1,9 @@
-import 'package:flare/components/course_card.dart';
+import 'package:flare/widgets/course_card.dart';
 import 'package:flare/models/course_summary.dart';
+import 'package:flare/repositories/auth.dart';
 import 'package:flare/repositories/course.dart';
 import 'package:flare/views/course_details.dart';
+import 'package:flare/views/sign_in.dart';
 import 'package:flutter/material.dart';
 
 class HomeView extends StatefulWidget {
@@ -11,10 +13,13 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   CourseRepo courseRepo = CourseRepo();
+  final authRepo = AuthRepo();
 
   onCardCourseTap(int courseId) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => CourseDetailsView(courseId: courseId)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => CourseDetailsView(courseId: courseId)));
   }
 
   buildCourseCardsGrid(List<CourseSummary> courseSummaries) {
@@ -42,8 +47,24 @@ class _HomeViewState extends State<HomeView> {
         backgroundColor: Colors.transparent,
       ),
       drawer: Drawer(
-        child: ListView(
-          children: [Text("Hamburger menu item 1")],
+        child: Column(
+          children: [
+            ListTile(
+              title: Text("My courses"),
+            ),
+            ListTile(
+              title: Text("My notes"),
+            ),
+            ListTile(
+              title: Text("Sign out"),
+              onTap: () {
+                authRepo.signOut().then((_) {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => SignInView()));
+                });
+              },
+            )
+          ],
         ),
       ),
       body: SingleChildScrollView(
