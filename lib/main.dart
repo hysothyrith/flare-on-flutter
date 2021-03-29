@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
               caption: GoogleFonts.lato(
                   textStyle: TextStyle(fontSize: 12, color: captionColor))),
           iconTheme: IconThemeData(color: primaryColor),
-          scaffoldBackgroundColor: backgroundColorDarker,
+          scaffoldBackgroundColor: primaryBackgroundColor,
           visualDensity: VisualDensity.adaptivePlatformDensity,
           textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(

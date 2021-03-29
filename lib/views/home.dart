@@ -63,7 +63,7 @@ class _HomeViewState extends State<HomeView> {
                   style: Theme.of(context).textTheme.headline2,
                 ),
                 FutureBuilder(
-                    future: courseRepo.getAll(),
+                    future: courseRepo.getAll(enrolled: true, limit: 6),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return Text("Error loading courses");
