@@ -1,6 +1,7 @@
 import 'package:flare/repositories/auth.dart';
 import 'package:flare/views/home.dart';
 import 'package:flare/views/sign_in.dart';
+import 'package:flare/widgets/flare_sized_circular_progress_indicator.dart';
 import 'package:flare/widgets/flare_text_form_field.dart';
 import 'package:flutter/material.dart';
 
@@ -22,25 +23,7 @@ class SignUpView extends StatelessWidget {
                       Image(image: AssetImage('assets/images/flare_logo.png')),
                 ),
               ),
-              SignUpForm(
-                onSubmit: (name, email, password) {
-                  AuthRepo authRepo = AuthRepo();
-                  authRepo
-                      .signUp(name: name, email: email, password: password)
-                      .then(
-                    (success) {
-                      if (success) {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomeView()));
-                      } else {
-                        print("Invalid sign up credentials");
-                      }
-                    },
-                  );
-                },
-              ),
+              SignUpForm(),
             ],
           ),
         ),
@@ -50,10 +33,6 @@ class SignUpView extends StatelessWidget {
 }
 
 class SignUpForm extends StatefulWidget {
-  final Function(String name, String email, String password) onSubmit;
-
-  SignUpForm({this.onSubmit});
-
   @override
   _SignUpFormState createState() => _SignUpFormState();
 }
@@ -62,6 +41,8 @@ class _SignUpFormState extends State<SignUpForm> {
   String name;
   String email;
   String password;
+  final _authRepo = AuthRepo();
+  bool _isLoading = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -119,12 +100,35 @@ class _SignUpFormState extends State<SignUpForm> {
 
     final _signUpButton = ElevatedButton(
         onPressed: () {
+          FocusScope.of(context).unfocus();
           if (_formKey.currentState.validate()) {
+            setState(() {
+              _isLoading = true;
+            });
             _formKey.currentState.save();
-            this.widget.onSubmit(name, email, password);
+            _authRepo.signUp(name: name, email: email, password: password).then(
+              (success) {
+                if (success) {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => HomeView()));
+                } else {
+                  final snackBar = SnackBar(
+                      content: Text(
+                          "Sorry, the sign up wasn't successful. Please try a different email."),
+                      backgroundColor: Theme.of(context).errorColor);
+                  Scaffold.of(context).showSnackBar(snackBar);
+                  _formKey.currentState.reset();
+                  setState(() {
+                    _isLoading = false;
+                  });
+                }
+              },
+            );
           }
         },
-        child: Text("Sign Up"));
+        child: _isLoading
+            ? FlareSizedCircularProgressIndicator(size: 16)
+            : Text("Sign Up"));
 
     final _signInInvitation = TextButton(
       onPressed: () {

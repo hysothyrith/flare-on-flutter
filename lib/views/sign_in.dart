@@ -1,6 +1,7 @@
 import 'package:flare/repositories/auth.dart';
 import 'package:flare/views/home.dart';
 import 'package:flare/views/sign_up.dart';
+import 'package:flare/widgets/flare_sized_circular_progress_indicator.dart';
 import 'package:flare/widgets/flare_text_form_field.dart';
 import 'package:flutter/material.dart';
 
@@ -22,19 +23,7 @@ class SignInView extends StatelessWidget {
                       Image(image: AssetImage('assets/images/flare_logo.png')),
                 ),
               ),
-              SignInForm(
-                onSubmit: (email, password) {
-                  AuthRepo auth = AuthRepo();
-                  auth.signIn(email: email, password: password).then((success) {
-                    if (success) {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => HomeView()));
-                    } else {
-                      print("Invalid credentials");
-                    }
-                  });
-                },
-              ),
+              SignInForm(),
             ],
           ),
         ),
@@ -44,17 +33,15 @@ class SignInView extends StatelessWidget {
 }
 
 class SignInForm extends StatefulWidget {
-  final Function(String, String) onSubmit;
-
-  SignInForm({this.onSubmit});
-
   @override
   _SignInFormState createState() => _SignInFormState();
 }
 
 class _SignInFormState extends State<SignInForm> {
+  final _authRepo = AuthRepo();
   String email;
   String password;
+  bool _isLoading = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -94,12 +81,33 @@ class _SignInFormState extends State<SignInForm> {
 
     final _signInButton = ElevatedButton(
         onPressed: () {
+          FocusScope.of(context).unfocus();
           if (_formKey.currentState.validate()) {
+            setState(() {
+              _isLoading = true;
+            });
             _formKey.currentState.save();
-            this.widget.onSubmit(email, password);
+            _authRepo.signIn(email: email, password: password).then((success) {
+              if (success) {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => HomeView()));
+              } else {
+                final snackBar = SnackBar(
+                    content: Text(
+                        "Sorry, the credentials weren't correct. Please try again."),
+                    backgroundColor: Theme.of(context).errorColor);
+                Scaffold.of(context).showSnackBar(snackBar);
+                _formKey.currentState.reset();
+                setState(() {
+                  _isLoading = false;
+                });
+              }
+            });
           }
         },
-        child: Text("Sign In"));
+        child: _isLoading
+            ? FlareSizedCircularProgressIndicator(size: 16)
+            : Text("Sign In"));
 
     final _signUpInvitation = TextButton(
       onPressed: () {
