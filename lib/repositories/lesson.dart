@@ -1,9 +1,9 @@
 import 'package:flare/models/lesson.dart';
-import 'package:flare/repositories/api_repository.dart';
+import 'package:flare/repositories/api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-class LessonRepo extends ApiRepository {
+class LessonRepo extends ApiRepo {
   LessonRepo() : super(baseUrlPostfix: "lessons");
 
   Future<Lesson> get(int id) async {

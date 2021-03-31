@@ -133,9 +133,7 @@ class CourseDetailsView extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.done) {
               return _buildCourseDetails(snapshot.data, context);
             } else {
-              return Container(
-                  alignment: Alignment.center,
-                  child: CircularProgressIndicator());
+              return Center(child: CircularProgressIndicator());
             }
           }),
     );

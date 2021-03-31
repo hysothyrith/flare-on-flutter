@@ -1,10 +1,35 @@
 import 'package:flare/models/note.dart';
-import 'package:flare/repositories/api_repository.dart';
+import 'package:flare/models/note_index.dart';
+import 'package:flare/repositories/api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-class NoteRepo extends ApiRepository {
+class NoteRepo extends ApiRepo {
   NoteRepo() : super(baseUrlPostfix: "notes");
+
+  Future<List<NoteIndex>> getAll() async {
+    final response = await http.get("$baseUrl", headers: await tokenHeader);
+
+    if (response.statusCode == 200) {
+      print("GET /notes successful");
+      return compute(noteIndexFromJson, response.body);
+    } else {
+      print(response.body);
+      throw Exception("GET /notes failed");
+    }
+  }
+
+  Future<Note> get(int id) async {
+    final response = await http.get("$baseUrl/$id", headers: await tokenHeader);
+
+    if (response.statusCode == 200) {
+      print("GET /notes/$id successful");
+      return compute(noteFromJson, response.body);
+    } else {
+      print(response.body);
+      throw Exception("GET /notes/$id failed");
+    }
+  }
 
   Future<Note> getByLessonId(int lessonId) async {
     final uri = createUriWithQuery({'lesson_id': lessonId});

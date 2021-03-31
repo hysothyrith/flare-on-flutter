@@ -1,11 +1,11 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-abstract class ApiRepository {
+abstract class ApiRepo {
   final storage = new FlutterSecureStorage();
   final absoluteBaseUrl = "http://10.0.2.2:8000/api";
   final String baseUrlPostfix;
 
-  ApiRepository({this.baseUrlPostfix = ""});
+  ApiRepo({this.baseUrlPostfix = ""});
 
   String get baseUrl => "$absoluteBaseUrl/$baseUrlPostfix";
 

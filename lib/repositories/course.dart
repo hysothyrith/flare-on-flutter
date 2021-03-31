@@ -1,11 +1,11 @@
 import 'package:flare/models/course.dart';
 import 'package:flare/models/course_summary.dart';
-import 'package:flare/repositories/api_repository.dart';
+import 'package:flare/repositories/api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class CourseRepo extends ApiRepository {
+class CourseRepo extends ApiRepo {
   CourseRepo() : super(baseUrlPostfix: "courses");
 
   Future<List<CourseSummary>> getAll({enrolled, limit}) async {

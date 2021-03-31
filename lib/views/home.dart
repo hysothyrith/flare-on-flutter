@@ -1,3 +1,4 @@
+import 'package:flare/views/my_notes.dart';
 import 'package:flare/widgets/course_card.dart';
 import 'package:flare/models/course_summary.dart';
 import 'package:flare/repositories/auth.dart';
@@ -54,6 +55,9 @@ class _HomeViewState extends State<HomeView> {
             ),
             ListTile(
               title: Text("My notes"),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyNotesView()));
+              },
             ),
             ListTile(
               title: Text("Sign out"),
