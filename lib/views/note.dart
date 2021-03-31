@@ -7,7 +7,7 @@ class NoteView extends StatefulWidget {
   final Note preFetchedNote;
   final bool autoFocus;
   int noteId;
-  VoidCallback onClose;
+  final Function(bool noteDidChange) onClose;
 
   NoteView(
       {this.lessonId,
@@ -48,15 +48,6 @@ class _NoteViewState extends State<NoteView> {
       } else {
         _noteRepo.getByLessonId(widget.lessonId).then(_setInitialNote);
       }
-
-      // _noteRepo.getByLessonId(widget.lessonId).then((note) {
-      //   initialNote = note;
-      //   setState(() {
-      //     _textFieldController.value = TextEditingValue(
-      //         text: note.content,
-      //         selection: TextSelection.collapsed(offset: note.content.length));
-      //   });
-      // });
     }
   }
 
@@ -73,11 +64,14 @@ class _NoteViewState extends State<NoteView> {
         leading: IconButton(
           onPressed: () async {
             final _enteredContent = _textFieldController.text;
+            var noteDidChange = true;
 
             if (initialNote.id == null) {
               if (_enteredContent.isNotEmpty) {
                 _noteRepo.create(
                     lessonId: widget.lessonId, content: _enteredContent);
+              } else {
+                noteDidChange = false;
               }
             } else {
               if (_enteredContent.isEmpty) {
@@ -85,10 +79,12 @@ class _NoteViewState extends State<NoteView> {
               } else if (_enteredContent.compareTo(initialNote.content) != 0) {
                 _noteRepo.updateContent(
                     id: initialNote.id, content: _enteredContent);
+              } else {
+                noteDidChange = false;
               }
             }
             if (widget.onClose != null) {
-              widget.onClose();
+              widget.onClose(noteDidChange);
             }
             Navigator.of(context).pop();
           },
@@ -97,7 +93,7 @@ class _NoteViewState extends State<NoteView> {
         backgroundColor: Colors.transparent,
         title: Text(
           "Notes",
-          style: Theme.of(context).textTheme.headline2,
+          style: Theme.of(context).textTheme.headline3,
         ),
       ),
       body: initialNote != null

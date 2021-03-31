@@ -25,6 +25,7 @@ class _HomeViewState extends State<HomeView> {
 
   buildCourseCardsGrid(List<CourseSummary> courseSummaries) {
     return GridView.count(
+      padding: EdgeInsets.only(left: 24, right: 24, top: 16, bottom: 24),
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       childAspectRatio: 11 / 15,
@@ -38,6 +39,16 @@ class _HomeViewState extends State<HomeView> {
             numberOfLessons: courseSummaries[index].numberOfLesson,
             onTap: onCardCourseTap);
       }),
+    );
+  }
+
+  _buildHeadline(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 0),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.headline2,
+      ),
     );
   }
 
@@ -56,7 +67,8 @@ class _HomeViewState extends State<HomeView> {
             ListTile(
               title: Text("My notes"),
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyNotesView()));
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => MyNotesView()));
               },
             ),
             ListTile(
@@ -74,35 +86,46 @@ class _HomeViewState extends State<HomeView> {
       body: SingleChildScrollView(
         physics: AlwaysScrollableScrollPhysics(),
         child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Your courses",
-                  style: Theme.of(context).textTheme.headline2,
-                ),
-                Text(
-                  "More courses",
-                  style: Theme.of(context).textTheme.headline2,
-                ),
-                FutureBuilder(
-                    future: courseRepo.getAll(enrolled: true, limit: 6),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Text("Error loading courses");
-                      }
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        return buildCourseCardsGrid(snapshot.data);
-                      } else {
-                        return Container(
-                            alignment: Alignment.center,
-                            child: CircularProgressIndicator());
-                      }
-                    }),
-              ],
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeadline("Your courses"),
+              FutureBuilder(
+                future: courseRepo.getAll(enrolled: true),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text("Error loading courses");
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return buildCourseCardsGrid(snapshot.data);
+                  } else {
+                    return Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.all(32),
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              ),
+              _buildHeadline("More courses"),
+              FutureBuilder(
+                future: courseRepo.getAll(enrolled: false, limit: 6),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text("Error loading courses");
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return buildCourseCardsGrid(snapshot.data);
+                  } else {
+                    return Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.all(32),
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
         ),
       ),

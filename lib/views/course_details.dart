@@ -30,6 +30,19 @@ class CourseDetailsView extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyText2,
         ));
 
+    final _courseInformation = Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          coverImage,
+          title,
+          caption,
+          description,
+        ],
+      ),
+    );
+
     _buildLessonItem(LessonSummary lesson, BuildContext context) {
       formatDuration(int duration) {
         return duration < 60
@@ -41,9 +54,13 @@ class CourseDetailsView extends StatelessWidget {
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             if (lesson.videoUrl == null) {
-              return TextLessonView(lessonId: lesson.id, lessonTitle: lesson.title,);
+              return TextLessonView(
+                lessonId: lesson.id,
+                lessonTitle: lesson.title,
+              );
             } else {
-              return VideoLessonView(lessonId: lesson.id, lessonTitle: lesson.title);
+              return VideoLessonView(
+                  lessonId: lesson.id, lessonTitle: lesson.title);
             }
           }));
         },
@@ -68,54 +85,52 @@ class CourseDetailsView extends StatelessWidget {
       );
     }
 
-    return SingleChildScrollView(
+    final _courseDetailsCard =  Container(
+      margin: EdgeInsets.only(top: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+        color: Theme.of(context).backgroundColor,
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                coverImage,
-                title,
-                caption,
-                description,
-              ],
+            padding:
+            EdgeInsets.only(left: 24, right: 24, top: 16, bottom: 8),
+            child: Text(
+              "Lessons",
+              style: Theme.of(context).textTheme.headline2,
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(top: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24), topRight: Radius.circular(24)),
-              color: Theme.of(context).backgroundColor,
-            ),
-            width: double.infinity,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                      EdgeInsets.only(left: 24, right: 24, top: 16, bottom: 8),
-                  child: Text(
-                    "Lessons",
-                    style: Theme.of(context).textTheme.headline2,
-                  ),
-                ),
-                ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: course.lessons.length,
-                  itemBuilder: (context, index) {
-                    return _buildLessonItem(course.lessons[index], context);
-                  },
-                ),
-              ],
-            ),
+          ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: course.lessons.length,
+            itemBuilder: (context, index) {
+              return _buildLessonItem(course.lessons[index], context);
+            },
           ),
         ],
       ),
     );
+
+    return ListView(
+      shrinkWrap: true,
+      children: [
+        _courseInformation,
+        _courseDetailsCard,
+      ],
+    );
+
+    // return SingleChildScrollView(
+    //   child: Column(
+    //     children: [
+    //       _courseInformation,
+    //       _courseDetailsCard,
+    //     ],
+    //   ),
+    // );
   }
 
   @override

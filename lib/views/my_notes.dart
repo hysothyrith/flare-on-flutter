@@ -1,12 +1,39 @@
-import 'package:flare/models/note.dart';
 import 'package:flare/models/note_index.dart';
 import 'package:flare/repositories/note.dart';
 import 'package:flare/views/note.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import "package:collection/collection.dart";
 
-class MyNotesView extends StatelessWidget {
+class MyNotesView extends StatefulWidget {
+  @override
+  _MyNotesViewState createState() => _MyNotesViewState();
+}
+
+class _MyNotesViewState extends State<MyNotesView> {
   final _noteRepo = NoteRepo();
+  List<NoteIndex> _noteIndexes;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchNoteIndexes();
+  }
+
+  fetchNoteIndexes() {
+    _noteRepo.getAll().then((fetchedIndexes) {
+      if (_noteIndexes == null ||
+          _noteIndexes.length != fetchedIndexes.length ||
+          listEquals(_noteIndexes, fetchedIndexes)) {
+        print("Indexes changed. Updating state...");
+        setState(() {
+          _noteIndexes = fetchedIndexes;
+        });
+      } else {
+        print("Indexes did not change. State preserved");
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +47,25 @@ class MyNotesView extends StatelessWidget {
           separatorBuilder: (context, index) => Divider(),
           itemBuilder: (context, index) {
             return ListTile(
-              title: Text(lessonNotes[index].lesson),
+              title: Text(
+                lessonNotes[index].lesson,
+                style: _theme.textTheme.bodyText1,
+              ),
               trailing: Icon(Icons.chevron_right),
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                        NoteView(noteId: lessonNotes[index].id)));
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => NoteView(
+                      noteId: lessonNotes[index].id,
+                      autoFocus: false,
+                      onClose: (noteDidChange) {
+                        if (noteDidChange) {
+                          fetchNoteIndexes();
+                        }
+                      },
+                    ),
+                  ),
+                );
               },
             );
           });
@@ -62,6 +102,7 @@ class MyNotesView extends StatelessWidget {
     }
 
     return Scaffold(
+      backgroundColor: _theme.backgroundColor,
       appBar: AppBar(
         title: Text(
           "My Notes",
@@ -69,19 +110,9 @@ class MyNotesView extends StatelessWidget {
         ),
         backgroundColor: Colors.transparent,
       ),
-      body: FutureBuilder(
-          future: _noteRepo.getAll(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Text("Error loading notes");
-            }
-            if (snapshot.connectionState == ConnectionState.done) {
-              final List<NoteIndex> noteIndexes = snapshot.data;
-              return _buildCourseNotes(noteIndexes);
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          }),
+      body: _noteIndexes != null
+          ? _buildCourseNotes(_noteIndexes)
+          : Center(child: CircularProgressIndicator()),
     );
   }
 }

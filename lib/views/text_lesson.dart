@@ -44,7 +44,7 @@ class _TextLessonViewState extends State<TextLessonView> {
         backgroundColor: Colors.transparent,
         title: Text(
           widget.lessonTitle,
-          style: Theme.of(context).textTheme.headline2,
+          style: Theme.of(context).textTheme.headline3,
         ),
         actions: [
           TextButton(
@@ -53,7 +53,11 @@ class _TextLessonViewState extends State<TextLessonView> {
                     builder: (context) => NoteView(
                           lessonId: widget.lessonId,
                           preFetchedNote: attachedNote,
-                          onClose: preFetchNote,
+                          onClose: ((noteDidChange) {
+                            if (noteDidChange) {
+                              preFetchNote();
+                            }
+                          }),
                         )));
               },
               child: Text("Notes"))

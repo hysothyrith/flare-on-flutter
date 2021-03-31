@@ -43,7 +43,7 @@ class _VideoLessonViewState extends State<VideoLessonView> {
         backgroundColor: Colors.transparent,
         title: Text(
           widget.lessonTitle,
-          style: Theme.of(context).textTheme.headline2,
+          style: Theme.of(context).textTheme.headline3,
         ),
         actions: [
           TextButton(
