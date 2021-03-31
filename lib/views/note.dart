@@ -59,7 +59,10 @@ class _NoteViewState extends State<NoteView> {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: _theme.backgroundColor,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () async {
@@ -93,7 +96,7 @@ class _NoteViewState extends State<NoteView> {
         backgroundColor: Colors.transparent,
         title: Text(
           "Notes",
-          style: Theme.of(context).textTheme.headline3,
+          style: _theme.textTheme.headline3,
         ),
       ),
       body: initialNote != null
@@ -101,10 +104,11 @@ class _NoteViewState extends State<NoteView> {
               controller: _textFieldController,
               autofocus: widget.autoFocus,
               maxLines: null,
-              style: Theme.of(context).textTheme.bodyText1,
+              style: _theme.textTheme.bodyText1,
               decoration: InputDecoration(
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.only(top: 8, left: 24, bottom: 24, right: 24),
+                  contentPadding:
+                      EdgeInsets.only(top: 8, left: 24, bottom: 24, right: 24),
                   hintText: "Your notes start here..."),
             )
           : Center(child: CircularProgressIndicator()),
