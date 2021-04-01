@@ -38,7 +38,7 @@ class CourseCard extends StatelessWidget {
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16), topRight: Radius.circular(16)),
               child: Image.network(this.coverImage,
-                  fit: BoxFit.contain, height: 160, width: 800),
+                  fit: BoxFit.contain, height: 140),
             ),
             Container(
               alignment: Alignment.center,

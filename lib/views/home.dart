@@ -75,7 +75,7 @@ class _HomeViewState extends State<HomeView> {
               title: Text("Sign out"),
               onTap: () {
                 authRepo.signOut().then((_) {
-                  Navigator.of(context).push(
+                  Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => SignInView()));
                 });
               },

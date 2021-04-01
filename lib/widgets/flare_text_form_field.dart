@@ -6,13 +6,15 @@ class FlareTextFormField extends StatefulWidget {
   final bool obscureText;
   final void Function(String) onSaved;
   final String Function(String) validator;
+  final TextInputType keyboardType;
 
   FlareTextFormField(
       {this.labelText,
       this.hintText,
       this.obscureText = false,
       this.onSaved,
-      this.validator});
+      this.validator,
+      this.keyboardType});
 
   @override
   _FlareTextFormFieldState createState() => _FlareTextFormFieldState();
@@ -36,6 +38,8 @@ class _FlareTextFormFieldState extends State<FlareTextFormField> {
         onSaved: widget.onSaved,
         validator: widget.validator,
         obscureText: widget.obscureText,
-        decoration: _decoration);
+        decoration: _decoration,
+        keyboardType: widget.keyboardType
+    );
   }
 }

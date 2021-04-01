@@ -2,12 +2,16 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 abstract class ApiRepo {
   final storage = new FlutterSecureStorage();
-  final absoluteBaseUrl = "http://10.0.2.2:8000/api";
   final String baseUrlPostfix;
+
+  // final domain = "192.168.0.102";
+  final domain = "10.0.2.2:8000";
 
   ApiRepo({this.baseUrlPostfix = ""});
 
-  String get baseUrl => "$absoluteBaseUrl/$baseUrlPostfix";
+  get apiPath => "api/$baseUrlPostfix";
+
+  String get baseUrl => "http://$domain/$apiPath";
 
   Future<String> get localToken async {
     return await storage.read(key: "token");
@@ -22,8 +26,7 @@ abstract class ApiRepo {
   }
 
   Uri createUriWithQuery(Map<String, dynamic> queryParams) {
-    return Uri.http("10.0.2.2:8000", "api/$baseUrlPostfix",
-        _createQueryParams(queryParams));
+    return Uri.http(domain, apiPath, _createQueryParams(queryParams));
   }
 
   Map<String, String> _createQueryParams(Map<String, dynamic> params) {

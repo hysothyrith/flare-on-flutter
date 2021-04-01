@@ -2,6 +2,7 @@ import 'package:flare/repositories/auth.dart';
 import 'package:flare/views/home.dart';
 import 'package:flare/views/sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
@@ -23,6 +24,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return MaterialApp(
       title: 'Flare',
       theme: ThemeData(
@@ -40,8 +43,10 @@ class MyApp extends StatelessWidget {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
               primary: primaryColor,
+              onSurface: primaryColor,
               padding:
                   EdgeInsets.only(left: 32, top: 16, right: 32, bottom: 16),
+
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(32))),
         ),

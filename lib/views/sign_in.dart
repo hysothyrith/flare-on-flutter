@@ -13,12 +13,13 @@ class SignInView extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: ListView(
+            physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             children: [
               Align(
                 alignment: Alignment.center,
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
+                  width: MediaQuery.of(context).size.width * 0.4,
                   child:
                       Image(image: AssetImage('assets/images/flare_logo.png')),
                 ),
@@ -54,6 +55,7 @@ class _SignInFormState extends State<SignInForm> {
     final _emailField = FlareTextFormField(
       labelText: "Email",
       hintText: "jamesbond@cia.com",
+      keyboardType: TextInputType.emailAddress,
       onSaved: (value) {
         email = value;
       },
@@ -80,39 +82,43 @@ class _SignInFormState extends State<SignInForm> {
     );
 
     final _signInButton = ElevatedButton(
-        onPressed: () {
-          FocusScope.of(context).unfocus();
-          if (_formKey.currentState.validate()) {
-            setState(() {
-              _isLoading = true;
-            });
-            _formKey.currentState.save();
-            _authRepo.signIn(email: email, password: password).then((success) {
-              if (success) {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => HomeView()));
-              } else {
-                final snackBar = SnackBar(
-                    content: Text(
-                        "Sorry, the credentials weren't correct. Please try again."),
-                    backgroundColor: Theme.of(context).errorColor);
-                Scaffold.of(context).showSnackBar(snackBar);
-                _formKey.currentState.reset();
-                setState(() {
-                  _isLoading = false;
-                });
-              }
-            });
-          }
-        },
+        onPressed: _isLoading
+            ? null
+            : () {
+                FocusScope.of(context).unfocus();
+                if (_formKey.currentState.validate()) {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  _formKey.currentState.save();
+                  _authRepo
+                      .signIn(email: email, password: password)
+                      .then((success) {
+                    if (success) {
+                      Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => HomeView()));
+                    } else {
+                      final snackBar = SnackBar(
+                          content: Text(
+                              "Sorry, the credentials weren't correct. Please try again."),
+                          backgroundColor: Theme.of(context).errorColor);
+                      Scaffold.of(context).showSnackBar(snackBar);
+                      _formKey.currentState.reset();
+                      setState(() {
+                        _isLoading = false;
+                      });
+                    }
+                  });
+                }
+              },
         child: _isLoading
             ? FlareSizedCircularProgressIndicator(size: 16)
             : Text("Sign In"));
 
     final _signUpInvitation = TextButton(
       onPressed: () {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => SignUpView()));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => SignUpView()));
       },
       child: Text("Don't have an account? Sign Up"),
       style: TextButton.styleFrom(
@@ -127,7 +133,7 @@ class _SignInFormState extends State<SignInForm> {
         child: Column(
           children: <Widget>[
             _emailField,
-            SizedBox(height: 16),
+            SizedBox(height: 8),
             _passwordField,
             SizedBox(height: 24),
             _signInButton,

@@ -13,12 +13,13 @@ class SignUpView extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: ListView(
+            physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             children: [
               Align(
                 alignment: Alignment.center,
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
+                  width: MediaQuery.of(context).size.width * 0.4,
                   child:
                       Image(image: AssetImage('assets/images/flare_logo.png')),
                 ),
@@ -58,6 +59,7 @@ class _SignUpFormState extends State<SignUpForm> {
     final _nameField = FlareTextFormField(
         labelText: "Name",
         hintText: "Justin Bieber",
+        keyboardType: TextInputType.name,
         onSaved: (value) {
           name = value;
         },
@@ -71,6 +73,7 @@ class _SignUpFormState extends State<SignUpForm> {
     final _emailField = FlareTextFormField(
       labelText: "Email",
       hintText: "justinbieber@gmail.com",
+      keyboardType: TextInputType.emailAddress,
       onSaved: (value) {
         email = value;
       },
@@ -109,7 +112,7 @@ class _SignUpFormState extends State<SignUpForm> {
             _authRepo.signUp(name: name, email: email, password: password).then(
               (success) {
                 if (success) {
-                  Navigator.pushReplacement(context,
+                  Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => HomeView()));
                 } else {
                   final snackBar = SnackBar(
@@ -132,8 +135,8 @@ class _SignUpFormState extends State<SignUpForm> {
 
     final _signInInvitation = TextButton(
       onPressed: () {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => SignInView()));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => SignInView()));
       },
       child: Text("Already have an account? Sign In"),
       style: TextButton.styleFrom(
@@ -148,9 +151,9 @@ class _SignUpFormState extends State<SignUpForm> {
           child: Column(
             children: <Widget>[
               _nameField,
-              SizedBox(height: 16),
+              SizedBox(height: 8),
               _emailField,
-              SizedBox(height: 16),
+              SizedBox(height: 8),
               _passwordField,
               SizedBox(height: 24),
               _signUpButton,
